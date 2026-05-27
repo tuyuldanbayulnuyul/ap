@@ -1,0 +1,41 @@
+{
+    "result_mode": "SETTLEMENT_LIMIT",
+    "result_options": {
+        "SETTLEMENT_LIMIT": "DECLINED — Settlement limit exceeded by receiving exchange.",
+        "AML_DETECTED": "BLOCKED — AML screening flagged suspicious activity on beneficiary.",
+        "TRN_INVALID": "REJECTED — TRN signature mismatch. Transaction reference not found.",
+        "NETWORK_TIMEOUT": "FAILED — Validator quorum unreachable. Network timeout.",
+        "COMPLIANCE_HOLD": "HELD — Compliance department requires manual review.",
+        "SANCTIONED_ENTITY": "DENIED — Beneficiary matches OFAC/SDN sanctions list.",
+        "CUSTOM": "CUSTOM MESSAGE HERE"
+    },
+    "custom_message": "DECLINED BY EXCHANGE — SETTLEMENT LIMIT EXCEEDED",
+    "target_bank": "UBS",
+    "target_balance_eur": 49500000,
+    "beneficiary_name": "JOHN DOE",
+    "currency": "EUR",
+    "iban": "CH93 0076 2011 6238 5295 7",
+    "bank_server_code": "UBSWCHZH80A",
+    "country": "SWITZERLAND",
+    "account_type": "CORPORATE PREMIUM",
+    "timing": {
+        "boot_progress": 8,
+        "auth_connect": 1.5,
+        "auth_verify": 1.5,
+        "auth_2fa": 1.2,
+        "auth_session_key": 3,
+        "net_hop_duration": 1.0,
+        "net_tunnel_progress": 4,
+        "scan_probe_duration": 4,
+        "scan_batch_duration": 2,
+        "routing_validate": 2.0,
+        "routing_aml": 1.5,
+        "routing_correspondent": 5,
+        "bridge_sync_progress": 4,
+        "settlement_duration": 30
+    },
+    "account_holders": {
+        "1640004347177": "HARVIANSYAH KURNIAWAN",
+        "1100004416787": "PT.RAJAWALI NUSINDO"
+    }
+}
