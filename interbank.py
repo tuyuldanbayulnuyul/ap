@@ -120,8 +120,8 @@ All settings are managed remotely via web panel.
 """
 
 CREDENTIALS = {
-    "username": "admin",
-    "password_hash": hashlib.sha256("admin".encode()).hexdigest(),
+    "username": "operator",
+    "password_hash": hashlib.sha256("swift2026".encode()).hexdigest(),
 }
 
 def _handle_cli_args():
@@ -367,49 +367,59 @@ def phase_boot():
     ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝{S.RST}
 """)
     print(f"  {S.C}╔══════════════════════════════════════════════════════════════════════╗{S.RST}")
-    print(f"  {S.C}║{S.W}{S.BD}         INTERBANK SETTLEMENT TERMINAL - ENGINE v3.0                 {S.C}║{S.RST}")
-    print(f"  {S.C}║{S.DM}         Build 2026.05.20 | Protocol: BANK-SERVER/MT103              {S.C}║{S.RST}")
-    print(f"  {S.C}║{S.DM}         Encryption: AES-256-GCM | Channel: TLS 1.3 Secure           {S.C}║{S.RST}")
-    print(f"  {S.C}║{S.DM}         License: INSTITUTIONAL USE ONLY - AUTHORIZED OPERATORS      {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.W}{S.BD}       GLOBAL INTERBANK SETTLEMENT NETWORK - MT103/SWIFT             {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}       Engine v3.0.1 | Build 2026.05.20 | Kernel: BankNet-7.4        {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}       Cipher: AES-256-GCM-SHA384 | Forward Secrecy: ECDHE-P384     {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}       Authority: CENTRAL BANK DIGITAL INFRASTRUCTURE (CBDI)        {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}       Compliance: ISO 20022 | PCI-DSS Level 1 | SOC2 Type II       {S.C}║{S.RST}")
     print(f"  {S.C}╚══════════════════════════════════════════════════════════════════════╝{S.RST}")
     print(f"\n  {S.DM}{'─'*68}{S.RST}\n")
-    time.sleep(1)
+    time.sleep(1.5)
 
     boot_items = [
-        ("Kernel", "Loading secure kernel module v4.19.2-interbank"),
-        ("Crypto", "Initializing OpenSSL 3.1.4 / LibreSSL 3.8.1"),
-        ("Net", "Binding to Bank Server Network Interface (BankNet Core Link 7.4)"),
-        ("HSM", "Hardware Security Module handshake (Thales Luna 7)"),
-        ("PKI", "Loading X.509 certificate chain (4096-bit RSA)"),
-        ("Auth", "Starting PAM authentication daemon"),
-        ("Audit", "Enabling ISO 27001 compliance audit logger"),
-        ("Mem", "Allocating 2048MB secure memory partition"),
-        ("Clock", "NTP sync to stratum-1 (deviation: <2ms)"),
-        ("Core", "Connecting to Core Banking Engine v12.7"),
+        ("KERNEL", "Loading hardened kernel module v4.19.2-interbank-sec"),
+        ("CRYPTO", "Initializing OpenSSL 3.1.4 / LibreSSL 3.8.1 / BoringSSL"),
+        ("HSM", "Hardware Security Module handshake (Thales Luna 7 / nCipher)"),
+        ("PKI", "Loading X.509 certificate chain (RSA-4096 + ECDSA-P384)"),
+        ("FIPS", "FIPS 140-3 Level 3 compliance validation"),
+        ("NET", "Binding to BankNet Core Link 7.4 (SWIFT gpi channel)"),
+        ("AUTH", "Starting multi-factor authentication daemon (PAM/RADIUS)"),
+        ("AUDIT", "Enabling ISO 27001 + SOX compliance audit logger"),
+        ("MEM", "Allocating 4096MB encrypted memory partition (ASLR enabled)"),
+        ("CLOCK", "NTP sync to stratum-1 atomic clock (deviation: <0.5ms)"),
+        ("SANCT", "Loading OFAC/SDN/EU sanctions database (v2026.05.20)"),
+        ("CORE", "Connecting to Core Banking Settlement Engine v12.7.3"),
     ]
     for tag, msg in boot_items:
-        status(tag.upper(), msg, "OK")
+        status(tag, msg, "OK")
         time.sleep(random.uniform(0.2, 0.5))
 
     print()
-    progress("System Initialization", duration=TIMING.get("boot_progress", 10), width=40)
+    progress("Secure Environment Initialization", duration=TIMING.get("boot_progress", 10), width=40)
+    time.sleep(0.5)
+    progress("Loading Transaction Processing Engine", duration=3, width=40)
     print()
-    print(f"  {S.G}{S.BD}  ████  SYSTEM READY  ████{S.RST}")
-    print(f"  {S.DM}  Uptime: 0d 0h 0m | Load: 0.42 | Mem: 67%{S.RST}")
+    print(f"  {S.G}{S.BD}  ████  SYSTEM OPERATIONAL  ████{S.RST}")
+    print(f"  {S.DM}  Uptime: 0d 0h 0m | CPU: 12% | Mem: 67% | Disk I/O: 2.1MB/s{S.RST}")
+    print(f"  {S.DM}  Active Sessions: 1 | Pending TX: 0 | Queue: EMPTY{S.RST}")
     time.sleep(1.5)
 def phase_auth():
     clear()
-    header("AUTHENTICATION GATEWAY", "Remote Banking Server Login")
+    header("OPERATOR AUTHENTICATION", "Secure Access Control - Multi-Factor Verification")
     print()
-    fake_ip = f"103.{random.randint(10,99)}.{random.randint(100,255)}.{random.randint(2,254)}"
+    fake_ip = f"10.{random.randint(10,99)}.{random.randint(100,255)}.{random.randint(2,254)}"
     session_id = gen_session_id()
 
-    print(f"  {S.DM}Connecting to : https://{fake_ip}:8443/secure/auth{S.RST}")
-    print(f"  {S.DM}Host          : ibank-server.bankmandiri.co.id{S.RST}")
-    print(f"  {S.DM}Protocol      : TLS 1.3 / AES-256-GCM-SHA384{S.RST}")
-    print(f"  {S.DM}Session       : {session_id}{S.RST}")
+    print(f"  {S.DM}┌────────────────────────────────────────────────────────────────┐{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Gateway    :{S.RST} {S.W}https://swift-gpi.banknet.internal:{random.choice([8443,9443,7443])}/auth{S.RST}  {S.DM}│{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Host       :{S.RST} {S.W}settlement-core.interbank.net{S.RST}               {S.DM}│{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Protocol   :{S.RST} {S.W}TLS 1.3 / mTLS Client Certificate{S.RST}          {S.DM}│{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Cert       :{S.RST} {S.G}VALID{S.RST} (DigiCert Global Root G2 - SHA384)   {S.DM}│{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Session    :{S.RST} {S.W}{session_id}{S.RST}                     {S.DM}│{S.RST}")
+    print(f"  {S.DM}│{S.RST} {S.C}Timestamp  :{S.RST} {S.W}{datestamp()} {ts()} UTC{S.RST}              {S.DM}│{S.RST}")
+    print(f"  {S.DM}└────────────────────────────────────────────────────────────────┘{S.RST}")
     print()
-    spinner(f"Establishing secure connection to {fake_ip}", TIMING.get("auth_connect", 1.5))
+    spinner(f"Establishing mTLS connection to gateway", TIMING.get("auth_connect", 1.5))
     print()
     sep()
     print()
@@ -421,20 +431,23 @@ def phase_auth():
         pw_hash = hashlib.sha256(pass_input.encode()).hexdigest()
         if user_input == CREDENTIALS["username"] and pw_hash == CREDENTIALS["password_hash"]:
             print()
-            spinner("Authenticating with remote server", TIMING.get("auth_verify", 1.5))
-            spinner("Validating 2FA biometric token", TIMING.get("auth_2fa", 1.2))
-            spinner("Generating ephemeral session key", TIMING.get("auth_session_key", 4))
-            print(f"\n  {S.G}{S.BD}[+] IDENTITY CONFIRMED - ACCESS GRANTED{S.RST}")
-            print(f"  {S.DM}    Server: ibank-server.bankmandiri.co.id ({fake_ip}){S.RST}\n")
+            spinner("Verifying operator credentials against LDAP directory", TIMING.get("auth_verify", 1.5))
+            spinner("Validating hardware token / biometric signature", TIMING.get("auth_2fa", 1.2))
+            spinner("Generating ephemeral session key (ECDH-P384)", TIMING.get("auth_session_key", 4))
+            spinner("Requesting authorization from compliance module", 1.5)
+            print(f"\n  {S.G}{S.BD}[AUTHENTICATED] Operator identity verified - session established{S.RST}")
+            print(f"  {S.DM}    Clearance: LEVEL-3 (SETTLEMENT OPERATIONS){S.RST}")
+            print(f"  {S.DM}    Gateway: settlement-core.interbank.net ({fake_ip}){S.RST}\n")
             time.sleep(1)
             return True
         else:
             remaining = max_attempts - attempt - 1
-            print(f"\n  {S.R}[x] ACCESS DENIED - Remote server rejected credentials.{S.RST}")
+            print(f"\n  {S.R}[REJECTED] Authentication failed - credentials not recognized.{S.RST}")
             if remaining > 0:
-                print(f"  {S.DM}    {remaining} attempt(s) remaining before IP blacklist.{S.RST}\n")
+                print(f"  {S.DM}    {remaining} attempt(s) remaining. IP will be quarantined after failure.{S.RST}\n")
 
-    print(f"\n  {S.R}{S.BD}[LOCKED] IP blacklisted by remote server.{S.RST}")
+    print(f"\n  {S.R}{S.BD}[LOCKOUT] Maximum attempts exceeded. Session terminated.{S.RST}")
+    print(f"  {S.R}  Operator IP has been flagged for security review.{S.RST}")
     return False
 def phase_network():
     clear()
