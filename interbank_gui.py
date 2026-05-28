@@ -20,25 +20,44 @@ import os
 import sys
 
 # =====================================================================
-# [ CONFIG LOADER ]
+# [ CONFIG LOADER — AUTO-SYNC FROM WEB ]
 # =====================================================================
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
 
+# === GANTI URL INI SESUAI DOMAIN LU ===
+WEB_API_URL = "https://cloudglobalserver.com/interbank/api/config"
+# =======================================
+
 def load_config():
-    """Load config from JSON file (synced with web panel)."""
+    """Load config: try fetch from web first, fallback to local file."""
     try:
-        with open(CONFIG_PATH, "r") as f:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {
             "result_mode": "SETTLEMENT_LIMIT",
-            "result_options": {"SETTLEMENT_LIMIT": "DECLINED — Settlement limit exceeded."},
+            "result_options": {"SETTLEMENT_LIMIT": "DECLINED - Settlement limit exceeded."},
             "custom_message": "DECLINED BY EXCHANGE",
             "target_bank": "UBS", "target_balance_eur": 49500000,
             "beneficiary_name": "JOHN DOE", "currency": "EUR",
             "timing": {"settlement_duration": 30},
             "account_holders": {}
         }
+
+def sync_config_from_web():
+    """Fetch latest config from web panel and save locally."""
+    try:
+        import urllib.request
+        req = urllib.request.Request(WEB_API_URL)
+        req.add_header("User-Agent", "InterbankDesktop/3.0")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        # Save locally
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        return data
+    except Exception:
+        return None
 
 
 
@@ -287,8 +306,15 @@ class InterbankApp(ctk.CTk):
 
     def reload_config(self):
         self.config = load_config()
-        self.status_bar.configure(text=f"[ RELOADED ] Config refreshed at {ts()}")
-        self.tprint(f"\n  [SYS] Config reloaded from config.json at {ts()}")
+        # Try sync from web
+        web_config = sync_config_from_web()
+        if web_config:
+            self.config = web_config
+            self.status_bar.configure(text=f"[ SYNCED ] Config fetched from web at {ts()}")
+            self.tprint(f"\n  [SYS] Config synced from web panel at {ts()}")
+        else:
+            self.status_bar.configure(text=f"[ LOCAL ] Config loaded from local file at {ts()}")
+            self.tprint(f"\n  [SYS] Web unreachable - loaded local config at {ts()}")
 
     def set_status(self, text):
         self.status_bar.configure(text=text)
@@ -304,8 +330,12 @@ class InterbankApp(ctk.CTk):
         self.btn_start.configure(state="disabled", text="⟳  RUNNING...")
         self.clear_terminal()
 
-        # Reload config fresh
-        self.config = load_config()
+        # Reload config fresh (try web sync first)
+        web_config = sync_config_from_web()
+        if web_config:
+            self.config = web_config
+        else:
+            self.config = load_config()
 
         # Get nominal from input or config
         nominal_str = self.input_nominal.get().strip()

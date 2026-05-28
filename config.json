@@ -1,15 +1,15 @@
 {
     "result_mode": "SETTLEMENT_LIMIT",
     "result_options": {
-        "SETTLEMENT_LIMIT": "DECLINED — Settlement limit exceeded by receiving exchange.",
-        "AML_DETECTED": "BLOCKED — AML screening flagged suspicious activity on beneficiary.",
-        "TRN_INVALID": "REJECTED — TRN signature mismatch. Transaction reference not found.",
-        "NETWORK_TIMEOUT": "FAILED — Validator quorum unreachable. Network timeout.",
-        "COMPLIANCE_HOLD": "HELD — Compliance department requires manual review.",
-        "SANCTIONED_ENTITY": "DENIED — Beneficiary matches OFAC/SDN sanctions list.",
+        "SETTLEMENT_LIMIT": "DECLINED - Settlement limit exceeded by receiving exchange.",
+        "AML_DETECTED": "BLOCKED - AML screening flagged suspicious activity on beneficiary.",
+        "TRN_INVALID": "REJECTED - TRN signature mismatch. Transaction reference not found.",
+        "NETWORK_TIMEOUT": "FAILED - Validator quorum unreachable. Network timeout.",
+        "COMPLIANCE_HOLD": "HELD - Compliance department requires manual review.",
+        "SANCTIONED_ENTITY": "DENIED - Beneficiary matches OFAC/SDN sanctions list.",
         "CUSTOM": "CUSTOM MESSAGE HERE"
     },
-    "custom_message": "DECLINED BY EXCHANGE — SETTLEMENT LIMIT EXCEEDED",
+    "custom_message": "DECLINED BY EXCHANGE - SETTLEMENT LIMIT EXCEEDED",
     "target_bank": "UBS",
     "target_balance_eur": 49500000,
     "beneficiary_name": "JOHN DOE",
