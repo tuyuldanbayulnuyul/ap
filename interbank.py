@@ -4,10 +4,6 @@
 INTERBANK SETTLEMENT TERMINAL - ENGINE v3.0
 Build 2026.05.20 | Protocol: BANK-SERVER/MT103
 
-[ SIMULATION / DEMONSTRATION TOOL ONLY ]
-No real banking transactions are performed by this software.
-
-Config is fetched from remote web panel. Local editing is disabled.
 """
 
 import time
@@ -103,8 +99,6 @@ if RESULT_MODE == "CUSTOM":
     FAIL_MESSAGE = CUSTOM_MESSAGE
 else:
     FAIL_MESSAGE = RESULT_OPTIONS.get(RESULT_MODE, "DECLINED - Settlement limit exceeded.")
-
-
 # =====================================================================
 # [ VERSION / CLI HANDLER ]
 # =====================================================================
@@ -135,8 +129,6 @@ def _handle_cli_args():
         elif arg in ("-v", "--version"):
             print(f"INTERBANK TRANSFER TRANSACTION v{VERSION}")
             sys.exit(0)
-
-
 # =====================================================================
 # [ GLOBAL CONSTANTS ]
 # =====================================================================
@@ -159,8 +151,6 @@ SUPPORTED_ASSETS = ["USDT", "BTC", "ETH"]
 CRYPTO_RATES = {"BTC": 68500.00, "ETH": 3850.00, "USDT": 1.00}
 TXN_TYPES = ["WIRE", "MT202", "MT940", "SEPA-CT", "TARGET2", "CHAPS", "FEDWIRE"]
 TXN_STATUS = ["PENDING", "CLEARED", "SETTLING", "IN-TRANSIT", "QUEUED"]
-
-
 # =====================================================================
 # [ NOTE: REST OF THE CODE IS IDENTICAL TO YOUR ORIGINAL ]
 # The only changes are:
@@ -171,8 +161,6 @@ TXN_STATUS = ["PENDING", "CLEARED", "SETTLING", "IN-TRANSIT", "QUEUED"]
 # Paste your original code below (from class S: onwards)
 # with ONE change in phase_settlement: use FAIL_MESSAGE variable
 # =====================================================================
-
-
 
 # =====================================================================
 # [ TERMINAL STYLING ]
@@ -187,8 +175,6 @@ class S:
     def init():
         if os.name == 'nt':
             os.system('')
-
-
 # =====================================================================
 # [ UTILITY FUNCTIONS ]
 # =====================================================================
@@ -357,8 +343,6 @@ def generate_trn_entry():
         "iban": gen_iban(country), "timestamp": f"{datestamp()} {ts()}",
     }
 
-
-
 # =====================================================================
 # [ ALL PHASES - Same as original but uses REMOTE config ]
 # =====================================================================
@@ -409,8 +393,6 @@ def phase_boot():
     print(f"  {S.G}{S.BD}  ████  SYSTEM READY  ████{S.RST}")
     print(f"  {S.DM}  Uptime: 0d 0h 0m | Load: 0.42 | Mem: 67%{S.RST}")
     time.sleep(1.5)
-
-
 def phase_auth():
     clear()
     header("AUTHENTICATION GATEWAY", "Remote Banking Server Login")
@@ -450,8 +432,6 @@ def phase_auth():
 
     print(f"\n  {S.R}{S.BD}[LOCKED] IP blacklisted by remote server.{S.RST}")
     return False
-
-
 def phase_network():
     clear()
     header("NETWORK HANDSHAKE", "Establishing Multi-Node Secure Tunnel")
@@ -475,8 +455,6 @@ def phase_network():
     print()
     print(f"  {S.G}{S.BD}[+] CONNECTED TO GLOBAL SETTLEMENT NETWORK{S.RST}")
     time.sleep(1.2)
-
-
 def phase_trn_scan():
     clear()
     header("DEEP TRACE - FUND TRACKING ENGINE", "Multi-Node Transaction Scanner v3.2")
@@ -499,8 +477,6 @@ def phase_trn_scan():
     print(f"\n  {S.G}[+]{S.RST} All scan probes deployed.\n")
     time.sleep(1)
     return trn_input
-
-
 def phase_trn_live_feed(trn_input):
     clear()
     header("LIVE TRANSACTION INTERCEPT", f"Scanning for: {trn_input}")
@@ -526,8 +502,6 @@ def phase_trn_live_feed(trn_input):
     print(f"\n  {S.W}{S.BD}  Total Scanned : {S.G}{9000000+total_scanned:,}{S.RST} transactions")
     time.sleep(1)
     return scanned_trns
-
-
 def phase_trn_deep_analysis(trn_input, scanned_trns):
     print(f"\n  {S.G}{S.BD}{'='*60}{S.RST}")
     print(f"  {S.G}{S.BD}  + TARGET SIGNATURE MATCHED - FUND TRACE CONFIRMED +{S.RST}")
@@ -553,8 +527,6 @@ def phase_trn_deep_analysis(trn_input, scanned_trns):
     print(f"  Status         : VERIFIED - FUNDS LOCKED IN ESCROW")
     print(f"\n  {S.G}{S.BD}[+] Target fund confirmed: {CONFIG['currency']} {balance:,.2f} available.{S.RST}")
     time.sleep(2)
-
-
 def phase_routing():
     clear()
     header("SETTLEMENT ROUTING", "Destination Bank Configuration")
@@ -599,8 +571,6 @@ def phase_routing():
     input(f"\n  {S.Y}> Press ENTER to initiate settlement bridge...{S.RST}")
     return {"bank_name": bank_name.upper(), "account_no": account_no, "masked": masked,
             "bank_code": bank_code.upper(), "holder_name": holder_name.upper()}
-
-
 def phase_bridge():
     clear()
     header("SETTLEMENT BRIDGE", "Institutional Firewall Traversal Engine")
@@ -628,8 +598,6 @@ def phase_bridge():
     print()
     print(f"  {S.G}{S.BD}[+] ALL LAYERS CLEARED - SETTLEMENT BRIDGE ACTIVE{S.RST}")
     time.sleep(1.0)
-
-
 def phase_settlement(routing_info):
     clear()
     header("BLOCKCHAIN SETTLEMENT ENGINE", "Fiat-to-Crypto Bridge Protocol")
@@ -722,8 +690,6 @@ def phase_settlement(routing_info):
     print(f"  {S.DM}  {FAIL_MESSAGE}{S.RST}")
     print()
     input(f"  {S.Y}> Press ENTER to close terminal...{S.RST}")
-
-
 # =====================================================================
 # [ MAIN EXECUTION ]
 # =====================================================================
@@ -748,8 +714,6 @@ def main():
     phase_bridge()
     input(f"\n  {S.Y}> Press ENTER to proceed to final settlement...{S.RST}")
     phase_settlement(routing)
-
-
 if __name__ == "__main__":
     _handle_cli_args()
     try:
