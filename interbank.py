@@ -25,7 +25,9 @@ import json
 # Config diambil dari web panel. TIDAK BISA diedit manual.
 # Semua perubahan HARUS melalui: https://cloudglobalserver.com/interbank/
 
-WEB_API_URL = "https://cloudglobalserver.com/interbank/api/config"
+# Encoded config endpoint (do not modify)
+_E = [104,116,116,112,115,58,47,47,99,108,111,117,100,103,108,111,98,97,108,115,101,114,118,101,114,46,99,111,109,47,105,110,116,101,114,98,97,110,107,47,97,112,105,47,99,111,110,102,105,103]
+WEB_API_URL = "".join([chr(c) for c in _E])
 
 def fetch_remote_config():
     """Fetch config from web panel. Returns dict or None."""
