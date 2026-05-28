@@ -228,7 +228,7 @@ class InterbankApp(ctk.CTk):
         self.btn_start = ctk.CTkButton(
             self.control_frame, text="▶  START ENGINE",
             font=ctk.CTkFont(family="Courier New", size=12, weight="bold"),
-            fg_color="#00ff8833", hover_color="#00ff8855",
+            fg_color="#1a4a2a", hover_color="#2a6a3a",
             border_width=1, border_color="#00ff88",
             text_color="#00ff88", command=self.start_engine
         )
@@ -237,7 +237,7 @@ class InterbankApp(ctk.CTk):
         self.btn_reload = ctk.CTkButton(
             self.control_frame, text="↻  RELOAD CONFIG",
             font=ctk.CTkFont(family="Courier New", size=11),
-            fg_color="#00ccff22", hover_color="#00ccff44",
+            fg_color="#1a2a3a", hover_color="#2a4a5a",
             border_width=1, border_color="#00ccff",
             text_color="#00ccff", command=self.reload_config
         )
@@ -246,7 +246,7 @@ class InterbankApp(ctk.CTk):
         self.btn_clear = ctk.CTkButton(
             self.control_frame, text="✕  CLEAR TERMINAL",
             font=ctk.CTkFont(family="Courier New", size=11),
-            fg_color="#ff444422", hover_color="#ff444444",
+            fg_color="#3a1a1a", hover_color="#5a2a2a",
             border_width=1, border_color="#ff4444",
             text_color="#ff4444", command=self.clear_terminal
         )
