@@ -370,21 +370,27 @@ def generate_trn_entry():
 
 def phase_boot():
     clear()
-    boot_art = f"""{S.C}
-    INTERBANK SETTLEMENT TERMINAL v3.0
-    Protocol: BANK-SERVER | Encryption: AES-256-GCM | TLS 1.3
-{S.RST}"""
-    print(boot_art)
-    print(f"  {S.DM}{'_'*68}{S.RST}")
-    print(f"  {S.W}{S.BD}        >>>  INTERBANK TRANSFER TRANSACTION  <<<{S.RST}")
-    print(f"  {S.DM}  Config: REMOTE ({WEB_API_URL}){S.RST}")
-    print(f"  {S.DM}{'_'*68}{S.RST}\n")
+    print(f"""{S.C}
+    {S.BD}██╗███╗   ██╗████████╗███████╗██████╗ ██████╗  █████╗ ███╗   ██╗██╗  ██╗
+    ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝
+    ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██████╔╝███████║██╔██╗ ██║█████╔╝
+    ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██╔══██╗██╔══██║██║╚██╗██║██╔═██╗
+    ██║██║ ╚████║   ██║   ███████╗██║  ██║██████╔╝██║  ██║██║ ╚████║██║  ██╗
+    ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝{S.RST}
+""")
+    print(f"  {S.C}╔══════════════════════════════════════════════════════════════════════╗{S.RST}")
+    print(f"  {S.C}║{S.W}{S.BD}         INTERBANK SETTLEMENT TERMINAL - ENGINE v3.0                 {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}         Build 2026.05.20 | Protocol: BANK-SERVER/MT103              {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}         Encryption: AES-256-GCM | Channel: TLS 1.3 Secure           {S.C}║{S.RST}")
+    print(f"  {S.C}║{S.DM}         License: INSTITUTIONAL USE ONLY - AUTHORIZED OPERATORS      {S.C}║{S.RST}")
+    print(f"  {S.C}╚══════════════════════════════════════════════════════════════════════╝{S.RST}")
+    print(f"\n  {S.DM}{'─'*68}{S.RST}\n")
     time.sleep(1)
 
     boot_items = [
         ("Kernel", "Loading secure kernel module v4.19.2-interbank"),
         ("Crypto", "Initializing OpenSSL 3.1.4 / LibreSSL 3.8.1"),
-        ("Net", "Binding to Bank Server Network Interface"),
+        ("Net", "Binding to Bank Server Network Interface (BankNet Core Link 7.4)"),
         ("HSM", "Hardware Security Module handshake (Thales Luna 7)"),
         ("PKI", "Loading X.509 certificate chain (4096-bit RSA)"),
         ("Auth", "Starting PAM authentication daemon"),
@@ -400,9 +406,8 @@ def phase_boot():
     print()
     progress("System Initialization", duration=TIMING.get("boot_progress", 10), width=40)
     print()
-    print(f"  {S.G}{S.BD}  ####  SYSTEM READY  ####{S.RST}")
+    print(f"  {S.G}{S.BD}  ████  SYSTEM READY  ████{S.RST}")
     print(f"  {S.DM}  Uptime: 0d 0h 0m | Load: 0.42 | Mem: 67%{S.RST}")
-    print(f"  {S.G}  [REMOTE CONFIG LOADED]{S.RST} Result: {RESULT_MODE}")
     time.sleep(1.5)
 
 
@@ -630,6 +635,16 @@ def phase_settlement(routing_info):
     header("BLOCKCHAIN SETTLEMENT ENGINE", "Fiat-to-Crypto Bridge Protocol")
     print()
 
+    # Input nominal manual
+    nominal_input = input(f"  {S.Y}> Settlement Amount ({CONFIG['currency']}) : {S.RST}").strip()
+    if nominal_input:
+        try:
+            balance = int(nominal_input.replace(",", "").replace(".", ""))
+        except ValueError:
+            balance = CONFIG["target_balance_eur"]
+    else:
+        balance = CONFIG["target_balance_eur"]
+
     wallet = input(f"  {S.Y}> Destination Wallet Address  : {S.RST}")
     network = input(f"  {S.Y}> Network (ERC20/TRC20/BTC)   : {S.RST}").upper().strip() or "ERC20"
     coin = input(f"  {S.Y}> Asset (USDT/BTC/ETH)        : {S.RST}").upper().strip()
@@ -639,7 +654,6 @@ def phase_settlement(routing_info):
     if not wallet.strip():
         wallet = "0x" + hashlib.sha256(str(time.time()).encode()).hexdigest()[:40]
 
-    balance = CONFIG["target_balance_eur"]
     rate = CRYPTO_RATES[coin]
     crypto_amt = balance / rate
 
