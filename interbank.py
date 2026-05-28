@@ -29,9 +29,13 @@ def fetch_remote_config():
     """Fetch config from web panel. Returns dict or None."""
     try:
         import urllib.request
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
         req = urllib.request.Request(WEB_API_URL)
         req.add_header("User-Agent", "InterbankTerminal/3.0")
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         return data
     except Exception as e:
