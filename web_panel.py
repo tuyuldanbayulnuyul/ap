@@ -47,11 +47,7 @@ def save():
     config["bank_server_code"] = request.form.get("bank_server_code", "")
     config["account_type"] = request.form.get("account_type", "CORPORATE PREMIUM")
 
-    # Update balance
-    try:
-        config["target_balance_eur"] = int(request.form.get("target_balance_eur", 49500000))
-    except ValueError:
-        config["target_balance_eur"] = 49500000
+    # Balance dihapus dari web panel - diinput manual di script
 
     # Update timing
     timing_fields = [
