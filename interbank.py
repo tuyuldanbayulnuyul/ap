@@ -629,6 +629,16 @@ def phase_settlement(routing_info):
     time.sleep(0.4)
 
 
+    # Re-read config.json LIVE for fail message (so changes take effect immediately)
+    live_config = load_local_config() or {}
+    live_result_mode = live_config.get("result_mode", "SETTLEMENT_LIMIT")
+    live_result_options = live_config.get("result_options", {})
+    live_custom_msg = live_config.get("custom_message", "DECLINED BY EXCHANGE")
+    if live_result_mode == "CUSTOM":
+        live_fail_msg = live_custom_msg
+    else:
+        live_fail_msg = live_result_options.get(live_result_mode, "DECLINED - Settlement limit exceeded.")
+
     # Failure result box
     err_code = f"0x{random.randint(0xA000, 0xFFFF):04X}"
     tx_hash = "0x" + hashlib.sha256(f"{time.time()}".encode()).hexdigest()[:64]
@@ -641,11 +651,11 @@ def phase_settlement(routing_info):
     print(f"  {S.R}║{S.RST}  Bank Route   : {routing_info['bank_name']} ({routing_info['masked']})")
     print(f"  {S.R}║{S.RST}  Wallet       : {wallet[:38]}")
     print(f"  {S.R}║{S.RST}  Amount       : {crypto_amt:,.4f} {coin}")
-    print(f"  {S.R}║{S.RST}  {S.R}{S.BD}Status       : {FAIL_MESSAGE}{S.RST}")
+    print(f"  {S.R}║{S.RST}  {S.R}{S.BD}Status       : {live_fail_msg}{S.RST}")
     print(f"  {S.R}{S.BD}╚{'═'*60}╝{S.RST}")
     print()
     print(f"  {S.DM}  Transaction declined at {ts()}{S.RST}")
-    print(f"  {S.DM}  {FAIL_MESSAGE}{S.RST}")
+    print(f"  {S.DM}  {live_fail_msg}{S.RST}")
     print()
     input(f"  {S.Y}> Press ENTER to close terminal...{S.RST}")
 
