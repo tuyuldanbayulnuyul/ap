@@ -488,17 +488,22 @@ def phase_trn_deep_analysis(trn_input, scanned_trns):
         hex_d = ' '.join([f"{random.randint(0,255):02X}" for _ in range(8)])
         print(f"  {S.Y}[{layer_name}]{S.RST} {desc} {S.DM}{hex_d}{S.RST} {S.G}[DECODED]{S.RST}")
         time.sleep(TIMING.get("decrypt_layer_duration", 5) * 0.3)
-    # Balance input manual
+    # Balance input manual (angka only)
     print()
-    balance_input = ""
-    while not balance_input.strip():
-        balance_input = input(f"  {S.Y}> Enter Target Balance ({CONFIG['currency']}) : {S.RST}")
-        if not balance_input.strip():
-            print(f"  {S.R}    [!] Balance is required. Please enter manually.{S.RST}")
-    try:
-        balance = int(balance_input.replace(",", "").replace(".", ""))
-    except ValueError:
-        balance = 49500000
+    balance = 0
+    while balance <= 0:
+        balance_input = input(f"  {S.Y}> Enter Target Balance (angka saja) : {S.RST}").strip()
+        if not balance_input:
+            print(f"  {S.R}    [!] Balance wajib diisi. Ketik angka saja (contoh: 49500000){S.RST}")
+            continue
+        # Hapus karakter non-angka
+        clean = ''.join(c for c in balance_input if c.isdigit())
+        if not clean:
+            print(f"  {S.R}    [!] Input harus angka! Jangan ketik huruf/simbol.{S.RST}")
+            continue
+        balance = int(clean)
+        if balance <= 0:
+            print(f"  {S.R}    [!] Balance harus lebih dari 0.{S.RST}")
     CONFIG["target_balance_eur"] = balance
     print(f"\n  {S.G}{S.BD}{'='*60}{S.RST}")
     print(f"  {S.G}{S.BD}      ██  TARGET FUND LOCATED - SIGNATURE VERIFIED  ██{S.RST}")
