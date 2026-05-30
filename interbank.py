@@ -46,8 +46,24 @@ def load_config():
         sys.exit(1)
     return config
 
-REMOTE_CONFIG = load_config()
+def fetch_live_prices():
+    """Fetch live crypto prices in EUR from CoinGecko."""
+    try:
+        import urllib.request
+        url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=eur"
+        req = urllib.request.Request(url)
+        req.add_header("User-Agent", "InterbankTerminal/3.0")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return {
+            "BTC": data.get("bitcoin", {}).get("eur", 67500.00),
+            "ETH": data.get("ethereum", {}).get("eur", 1850.00),
+            "USDT": data.get("tether", {}).get("eur", 0.91),
+        }
+    except Exception:
+        return {"BTC": 67500.00, "ETH": 1850.00, "USDT": 0.91}
 
+REMOTE_CONFIG = load_config()
 
 CONFIG = {
     "target_bank": REMOTE_CONFIG.get("target_bank", "UBS"),
@@ -104,7 +120,6 @@ def _handle_cli_args():
             print(f"INTERBANK TRANSFER TRANSACTION v{VERSION}"); sys.exit(0)
 
 
-
 BANK_REGISTRY = [
     ("UBS", "UBSWCHZH", "CH"), ("CHASE", "CHASUS33", "US"),
     ("CITI", "CITIUS33", "US"), ("BARCLAYS", "BARCGB22", "GB"),
@@ -120,7 +135,7 @@ BANK_REGISTRY = [
     ("ANZ", "ANZBAU3M", "AU"), ("WESTPAC", "WPACAU2S", "AU"),
 ]
 SUPPORTED_ASSETS = ["USDT", "BTC", "ETH"]
-CRYPTO_RATES = {"BTC": 68500.00, "ETH": 3850.00, "USDT": 1.00}
+CRYPTO_RATES = fetch_live_prices()
 TXN_TYPES = ["WIRE", "MT202", "MT940", "SEPA-CT", "TARGET2", "CHAPS", "FEDWIRE"]
 TXN_STATUS = ["PENDING", "CLEARED", "SETTLING", "IN-TRANSIT", "QUEUED"]
 
@@ -146,8 +161,6 @@ def gen_iban(country="GB"):
 def gen_session_id():
     seed = f"{time.time()}{random.randint(0,99999)}"
     return hashlib.sha256(seed.encode()).hexdigest()[:20].upper()
-
-
 
 def header(title, subtitle=None, width=64):
     border = "=" * width
@@ -215,8 +228,6 @@ def trace_hop_animation(hop_num, node_name, node_type, duration=1.2):
         sys.stdout.write(f"\r  {S.Y}HOP {hop_num:02d}{S.RST} {S.C}{frame}{S.RST} {node_name:<25} [{node_type}]")
         sys.stdout.flush(); time.sleep(0.1); i += 1
     sys.stdout.write(f"\r  {S.G}HOP {hop_num:02d}{S.RST} {S.G}▸▸▸▸▸{S.RST} {node_name:<25} [{node_type}] {S.DM}{latency}ms{S.RST} {S.G}✓{S.RST}\n")
-
-
 
 def get_masked_input(prompt=""):
     sys.stdout.write(prompt); sys.stdout.flush()
@@ -303,8 +314,6 @@ def phase_boot():
     print(f"  {S.DM}  Active Sessions: 1 | Pending TX: 0 | Queue: EMPTY{S.RST}")
     time.sleep(1.5)
 
-
-
 def phase_auth():
     clear()
     header("OPERATOR AUTHENTICATION", "Secure Access Control - Multi-Factor Verification")
@@ -372,7 +381,6 @@ def phase_network():
     print(f"  {S.G}{S.BD}[✓] CONNECTED TO GLOBAL SETTLEMENT NETWORK{S.RST}")
     time.sleep(1.2)
 
-
 def phase_trn_scan():
     clear()
     header("DEEP TRACE - FUND TRACKING ENGINE", "Multi-Node Transaction Scanner v3.2")
@@ -395,16 +403,13 @@ def phase_trn_scan():
     time.sleep(1)
     return trn_input
 
-
-
 def phase_trn_live_feed(trn_input):
     clear()
     header("LIVE TRANSACTION INTERCEPT", f"Scanning for: {trn_input}")
     print()
     scanned_trns = []
     total_scanned = 0
-    target_display = random.randint(1000000, 1200000)
-
+    target_display = random.randint(100, 200)
     for i in range(target_display):
         entry = generate_trn_entry()
         scanned_trns.append(entry) if i < 100 else None
@@ -413,16 +418,12 @@ def phase_trn_live_feed(trn_input):
         trn_c = trn_raw[:4] + '*' * (len(trn_raw) - 6) + trn_raw[-2:] if len(trn_raw) > 6 else trn_raw
         print(f"  {S.DM}|{S.RST} {S.Y}{trn_c:<14}{S.RST} | {S.B}{entry['type']:<8}{S.RST} | {S.C}{entry['bank']:<12}{S.RST} | {S.W}{entry['amount']:>10,}{S.RST} | {entry['status']:<8} {S.DM}|{S.RST}")
         time.sleep(random.uniform(0.005, 0.015))
-
         if (i + 1) % 50000 == 0:
             total_scanned += random.randint(200000, 500000)
             scanning_animation(f"Batch #{(i+1)//50000} | {total_scanned:,} scanned",
                              duration=random.uniform(TIMING.get("scan_batch_duration", 150) * 0.007,
                                                     TIMING.get("scan_batch_duration", 150) * 0.012))
-
-    # Jump to large total after all rows displayed
     total_scanned += random.randint(8000000, 12000000)
-
     print(f"\n  {S.W}{S.BD}  Total Scanned : {S.G}{total_scanned:,}{S.RST} transactions")
     time.sleep(1)
     return scanned_trns
@@ -435,15 +436,12 @@ def phase_trn_deep_analysis(trn_input, scanned_trns):
     print(f"  {S.G}{S.BD}{'='*60}{S.RST}")
     time.sleep(1.5)
     print()
-
     layers = [("Layer 1/4", "Stripping TLS envelope"), ("Layer 2/4", "Decoding Bank Server payload"),
               ("Layer 3/4", "Extracting beneficiary metadata"), ("Layer 4/4", "Reconstructing ledger entry")]
     for layer_name, desc in layers:
         hex_d = ' '.join([f"{random.randint(0,255):02X}" for _ in range(8)])
         print(f"  {S.Y}[{layer_name}]{S.RST} {desc} {S.DM}{hex_d}{S.RST} {S.G}[DECODED]{S.RST}")
         time.sleep(TIMING.get("decrypt_layer_duration", 5) * 0.3)
-
-    # Balance input - numbers only, loops until valid
     print()
     balance = 0
     while balance <= 0:
@@ -458,9 +456,7 @@ def phase_trn_deep_analysis(trn_input, scanned_trns):
         balance = int(clean)
         if balance <= 0:
             print(f"  {S.R}    [!] Balance must be greater than 0.{S.RST}")
-
     CONFIG["target_balance_eur"] = balance
-
     print(f"\n  {S.G}{S.BD}{'='*60}{S.RST}")
     print(f"  {S.G}{S.BD}      ██  TARGET FUND LOCATED - SIGNATURE VERIFIED  ██{S.RST}")
     print(f"  {S.G}{S.BD}{'='*60}{S.RST}")
@@ -471,8 +467,6 @@ def phase_trn_deep_analysis(trn_input, scanned_trns):
     print(f"  Status         : VERIFIED - FUNDS LOCKED IN ESCROW")
     print(f"\n  {S.G}{S.BD}[✓] Target fund confirmed: {CONFIG['currency']} {balance:,.2f} available.{S.RST}")
     time.sleep(2)
-
-
 
 def phase_routing():
     clear()
@@ -520,17 +514,23 @@ def phase_bridge():
     spinner("Pinging CryptoHost Settlement Gateway", TIMING.get("bridge_ping", 1.5))
     print()
     firewalls = [
-        ("BANK-SANCTIONS-SCREEN", "COMPLIANCE"), ("FED-RESERVE-OFAC", "REGULATORY"),
-        ("ECB-OVERSIGHT-NODE", "REGULATORY"), ("INTERPOL-I-24/7", "SECURITY"),
-        ("FATF-GREYLST-CHECK", "AML"), ("COLD-WALLET-AUTH", "CRYPTO"),
-        ("TREASURY-NOSTRO-LINK", "BANKING"),
+        ("BANK-SANCTIONS-SCREEN", "COMPLIANCE", "CLEARED"),
+        ("FED-RESERVE-OFAC", "REGULATORY", "WARNING"),
+        ("ECB-OVERSIGHT-NODE", "REGULATORY", "CLEARED"),
+        ("INTERPOL-I-24/7", "SECURITY", "CLEARED"),
+        ("FATF-GREYLST-CHECK", "AML", "WARNING"),
+        ("COLD-WALLET-AUTH", "CRYPTO", "CLEARED"),
+        ("TREASURY-NOSTRO-LINK", "BANKING", "CLEARED"),
     ]
-    for fw_name, fw_type in firewalls:
+    for fw_name, fw_type, result in firewalls:
         sys.stdout.write(f"  {S.B}  [{fw_type:^12}]{S.RST} {fw_name:<24} ")
         sys.stdout.flush()
         for _ in range(random.randint(5, 12)):
             sys.stdout.write(f"{S.Y}·{S.RST}"); sys.stdout.flush(); time.sleep(0.1)
-        print(f" {S.G}[CLEARED]{S.RST}")
+        if result == "WARNING":
+            print(f" {S.Y}[WARNING]{S.RST}")
+        else:
+            print(f" {S.G}[CLEARED]{S.RST}")
         time.sleep(0.2)
     print()
     progress("Multi-Sig Escrow Lock Override", duration=TIMING.get("bridge_escrow_progress", 2.5), width=35, color=S.Y)
@@ -538,8 +538,6 @@ def phase_bridge():
     print()
     print(f"  {S.G}{S.BD}[✓] ALL LAYERS CLEARED - SETTLEMENT BRIDGE ACTIVE{S.RST}")
     time.sleep(1.0)
-
-
 
 def phase_settlement(routing_info):
     clear()
@@ -556,7 +554,8 @@ def phase_settlement(routing_info):
     print(f"\n  From    : ESCROW VAULT")
     print(f"  To      : {wallet[:20]}...{wallet[-8:] if len(wallet)>28 else ''}")
     print(f"  Amount  : {CONFIG['currency']} {balance:>14,.2f}")
-    print(f"  Convert : {crypto_amt:>14,.4f} {coin}")
+    print(f"  Rate    : 1 {coin} = {CONFIG['currency']} {rate:,.2f}")
+    print(f"  Convert : {crypto_amt:>14,.6f} {coin}")
     print(f"  Network : {network}")
     input(f"\n  {S.Y}> Press ENTER to execute settlement...{S.RST}")
     print()
@@ -581,21 +580,19 @@ def phase_settlement(routing_info):
     sys.stdout.write(f"{S.R}{'█' * 2}{S.RST}{S.DM}{'░' * (remaining - 2)}{S.RST}] {S.R}{S.BD}FAILED{S.RST}\n")
     time.sleep(0.5)
     print()
-    print(f"  {S.R}[✗] CRITICAL: Smart contract execution reverted{S.RST}")
-    time.sleep(0.4)
-    print(f"  {S.R}[✗] TX REJECTED: Amount exceeds settlement capacity{S.RST}")
-    time.sleep(0.4)
+    print(f"  {S.R}[✗] TX REJECTED: AML/CFT compliance screening failed — transaction flagged by regulatory authority{S.RST}")
+    time.sleep(0.8)
     err_code = f"0x{random.randint(0xA000, 0xFFFF):04X}"
     tx_hash = "0x" + hashlib.sha256(f"{time.time()}".encode()).hexdigest()[:64]
     print(f"\n  {S.R}{S.BD}╔{'═'*60}╗{S.RST}")
     print(f"  {S.R}{S.BD}║{'SETTLEMENT FAILED':^60}║{S.RST}")
     print(f"  {S.R}{S.BD}╠{'═'*60}╣{S.RST}")
-    print(f"  {S.R}{S.BD}║{S.RST}  Error        : ERR_NETWORK_TIMEOUT ({err_code})")
+    print(f"  {S.R}{S.BD}║{S.RST}  Error        : ERR_AML_COMPLIANCE ({err_code})")
     print(f"  {S.R}{S.BD}║{S.RST}  TX Hash      : {tx_hash[:40]}...")
     print(f"  {S.R}{S.BD}║{S.RST}  Beneficiary  : {routing_info['holder_name']}")
     print(f"  {S.R}{S.BD}║{S.RST}  Bank Route   : {routing_info['bank_name']} ({routing_info['masked']})")
     print(f"  {S.R}{S.BD}║{S.RST}  Wallet       : {wallet[:38]}")
-    print(f"  {S.R}{S.BD}║{S.RST}  Amount       : {crypto_amt:,.4f} {coin}")
+    print(f"  {S.R}{S.BD}║{S.RST}  Amount       : {crypto_amt:,.6f} {coin}")
     print(f"  {S.R}{S.BD}║{S.RST}  {S.R}{S.BD}Status       : {FAIL_MESSAGE}{S.RST}")
     print(f"  {S.R}{S.BD}╚{'═'*60}╝{S.RST}")
     print()
@@ -603,8 +600,6 @@ def phase_settlement(routing_info):
     print(f"  {S.DM}  {FAIL_MESSAGE}{S.RST}")
     print()
     input(f"  {S.Y}> Press ENTER to close terminal...{S.RST}")
-
-
 
 def main():
     S.init()
